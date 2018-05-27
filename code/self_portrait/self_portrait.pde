@@ -1,43 +1,58 @@
-// Source:
-// https://processing.org/examples/edgedetection.html
+// Sources:
+// https://www.youtube.com/watch?v=NbX3RnlAyGU&index=7&list=PLRqwX-V7Uu6YB9x6f23CBftiyx0u_5sO9
+// http://learningprocessing.com/examples/chp15/example-15-12-PixelNeighborEdge
+// http://learningprocessing.com/examples/chp15/example-15-14-Pointillism
 
-float[][] kernel = {{ -1, -1, -1}, 
-                    { -1,  9, -1}, 
-                    { -1, -1, -1}};
-                    
-PImage img;
 
-void setup() { 
-  size(640, 360);
-  img = loadImage("moon.jpg"); // Load the original image
-  noLoop();
+PImage img, img2, jostein, brian;
+int pointillize = 16;
+
+void setup() {
+  jostein = loadImage("jostein.jpg");
+  brian = loadImage("brian.jpg");
+  
+  // Determine image sizes for subsequent combination
+  // jostein.jpg => (4752, 3168)
+  // brian.jpg => (287, 303)
+  // Need to reduce img size to that of img2
+  print(jostein.width, jostein.height, brian.width, brian.height);
+  
+  jostein.resize(287, 303);
+  //brian.resize(800, 600);
+  
+  // Source:
+  // https://forum.processing.org/one/topic/combine-two-pimages-into-one.html
+  PGraphics output = createGraphics(287 * 2, 303, JAVA2D);
+  output.beginDraw();
+  output.image(jostein, 0, 0);
+  output.image(brian, 287, 0);
+  output.endDraw();
+  
+  // Make sure graphic is an image
+  img = output;
+  
+  // Change size of window
+  surface.setSize(img.width, img.height);
+  background(255);
+  smooth();
 }
 
 void draw() {
-  image(img, 0, 0); // Displays the image from point (0,0) 
-  img.loadPixels();
-  // Create an opaque image of the same size as the original
-  PImage edgeImg = createImage(img.width, img.height, RGB);
-  // Loop through every pixel in the image.
-  for (int y = 1; y < img.height-1; y++) { // Skip top and bottom edges
-    for (int x = 1; x < img.width-1; x++) { // Skip left and right edges
-      float sum = 0; // Kernel sum for this pixel
-      for (int ky = -1; ky <= 1; ky++) {
-        for (int kx = -1; kx <= 1; kx++) {
-          // Calculate the adjacent pixel for this kernel point
-          int pos = (y + ky)*img.width + (x + kx);
-          // Image is grayscale, red/green/blue are identical
-          float val = red(img.pixels[pos]);
-          // Multiply adjacent pixels based on the kernel values
-          sum += kernel[ky+1][kx+1] * val;
-        }
-      }
-      // For this pixel in the new image, set the gray value
-      // based on the sum from the kernel
-      edgeImg.pixels[y*img.width + x] = color(sum, sum, sum);
-    }
-  }
-  // State that there are changes to edgeImg.pixels[]
-  edgeImg.updatePixels();
-  image(edgeImg, width/2, 0); // Draw the new image
+  
+  // Pick a random point
+  int x = int(random(img.width));
+  int y = int(random(img.height));
+  int loc = x + y*img.width;
+  
+  // Look up the RGB color in the source image
+  loadPixels();
+  float r = red(img.pixels[loc]);
+  float g = green(img.pixels[loc]);
+  float b = blue(img.pixels[loc]);
+  noStroke();
+  
+  // Back to shapes! Instead of setting a pixel, we use the color 
+  // from a pixel to draw a circle.
+  fill(r,g,b,100);
+  ellipse(x,y,pointillize,pointillize); 
 }
