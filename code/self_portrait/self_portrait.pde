@@ -56,3 +56,11 @@ void draw() {
   fill(r,g,b,100);
   ellipse(x,y,pointillize,pointillize); 
 }
+
+void keyPressed() {
+  if (pointillize == 16) {
+    pointillize = int(random(32));
+  } else {
+    pointillize = 16;
+  }
+}
