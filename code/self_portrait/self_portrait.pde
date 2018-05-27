@@ -57,6 +57,9 @@ void draw() {
   ellipse(x,y,pointillize,pointillize); 
 }
 
+// Sources:
+// https://processing.org/reference/random_.html
+// https://processing.org/reference/keyPressed.html
 void keyPressed() {
   if (pointillize == 16) {
     pointillize = int(random(32));
