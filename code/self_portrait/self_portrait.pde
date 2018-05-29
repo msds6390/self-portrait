@@ -1,47 +1,61 @@
-// Sources:
-// https://www.youtube.com/watch?v=NbX3RnlAyGU&index=7&list=PLRqwX-V7Uu6YB9x6f23CBftiyx0u_5sO9
-// http://learningprocessing.com/examples/chp15/example-15-12-PixelNeighborEdge
-// http://learningprocessing.com/examples/chp15/example-15-14-Pointillism
+/*
+  Jostein Barry-Straume
+  Brian Yu
+  MSDS 6390 - Section 404
+  Assignment 2: Self-Portrait
+*/
 
-
-PImage img, img2, jostein, brian;
-int pointillize = 32;
+PImage jostein, brian;
+int pointillize = 16;
 
 void setup() {
+  // Load the images for our self-portraits
   jostein = loadImage("jostein.jpg");
   brian = loadImage("brian.jpg");
   
-  // Determine image sizes for subsequent combination
-  // jostein.jpg => (4752, 3168)
-  // brian.jpg => (287, 303)
-  // Need to reduce img size to that of img2
-  //print(jostein.width, jostein.height, brian.width, brian.height);
-  
+  // Match the size of brian.jpg
   jostein.resize(896, 943);
   
-  // Source:
-  // https://forum.processing.org/one/topic/combine-two-pimages-into-one.html
-  //PGraphics output = createGraphics(287 * 2, 303, JAVA2D);
-  //output.beginDraw();
-  //output.image(jostein, 0, 0);
-  //output.image(brian, 287, 0);
-  //output.endDraw();
+  /*
+    Combine jostein.jpg and brian.jpg into one image
+    Source:
+    https://forum.processing.org/one/topic/combine-two-pimages-into-one.html
+    //PGraphics output = createGraphics(287 * 2, 303, JAVA2D);
+    //output.beginDraw();
+    //output.image(jostein, 0, 0);
+    //output.image(brian, 287, 0);
+    //output.endDraw();
+    Make sure graphic is an image
+    //img = output;
   
-  // Make sure graphic is an image
-  //img = output;
-  
-  // Change size of window
+    Change size of window
+    Needs to be the sum total width
+    of brian.jpg and jostein.jpg combined
+  */
   int windowWidth = 896 * 2;
-  //size(896, 943);
   surface.setSize(windowWidth, 943);
   background(255);
   smooth();
 }
 
 void draw() {
-  //image(brian, 0, 0);
-  //background(166, 233, 166);  // pastel green
+  /*
+    *********************************
+    * Brian's Self-Portrait Section *
+    *********************************
+  
+    Places image of brian.jpg into window
+    for which to draw over for Brian's self-portrait
+    //image(brian, 0, 0);
+    //background(166, 233, 166);  // pastel green
 
+    Workaround after combining code:
+    Cannot set background to pastel green as it
+    obfuscates the drawing of jostein.jpg
+    Solution is to simply draw a pastel green
+    rectangle on the left-half of the screen
+    before drawing Brian's face.
+  */
   fill(166, 233, 166);
   rect(0, 0, 896, 943); 
  
@@ -224,37 +238,59 @@ void draw() {
   fill(0, 0, 255);
   text("BY", 20, 900);
   
-  // *****
-  // Jostein Section
-  // *****
-  // Pick a random point
-  //image(jostein, 896, 0);
-
-  int x = int(random(jostein.width));
-  //int x = int(random(896, 896 * 2));
-  int y = int(random(jostein.height));
-  int loc = x + y*jostein.width;
+  /*
+    ***********************************
+    * Jostein's Self-Portrait Section *
+    ***********************************
+    
+    Sources:
+    https://www.youtube.com/watch?v=NbX3RnlAyGU&index=7&list=PLRqwX-V7Uu6YB9x6f23CBftiyx0u_5sO9
+    http://learningprocessing.com/examples/chp15/example-15-12-PixelNeighborEdge
+    http://learningprocessing.com/examples/chp15/example-15-14-Pointillism
   
-  // Look up the RGB color in the source image
+    Picks a random point within jostein.jpg
+  */
+  int x = int(random(jostein.width));
+  int y = int(random(jostein.height));
+  int loc = x + y * jostein.width;
+  
+  // Look up the RGB color in the jostein.jpg image
   loadPixels();
-  // 845350
   float r = red(jostein.pixels[loc]);
   float g = green(jostein.pixels[loc]);
   float b = blue(jostein.pixels[loc]);
   noStroke();
   
-  // Back to shapes! Instead of setting a pixel, we use the color 
-  // from a pixel to draw a circle.
+  /*
+    Fill calls the color scheme of the randomly chosen pixel,
+    which is then used by ellipse to recreate the color scheme
+    of that given area.
+  
+    We need to shift the x-axis to the right by the width
+    of 896 pixels so that the randomly drawn points will end
+    up on the right half of the window. In other words,
+    shifting by the width of Jostein's image ensures that 
+    the pointillism image will populate in its proper place.
+  */
   fill(r,g,b,100);
   ellipse(x + 896, y, pointillize, pointillize); 
 }
 
-// Sources:
-// https://processing.org/reference/random_.html
-// https://processing.org/reference/keyPressed.html
+/*
+  As the jostein.jpg image is recreated in the style
+  of pointillism, the user can press any key to
+  change the size of the drawn ellipse to a radius
+  somewhere between 1 and 32 pixels.
+  The default radius size is 16 pixels, as indicated by
+  the global variable int pointillize = 16; 
+
+  Sources:
+  https://processing.org/reference/random_.html
+  https://processing.org/reference/keyPressed.html
+*/
 void keyPressed() {
   if (pointillize == 16) {
-    pointillize = int(random(32));
+    pointillize = int(random(1, 33));
   } else {
     pointillize = 16;
   }
